@@ -9,6 +9,7 @@ import {
 import { ApiTransport } from './api/api-transport';
 
 import { Header } from './components/header/header';
+import { TaskViewModel } from './models/task-view-model';
 import { SignInPage } from './pages/auth-pages/sign-in-page';
 import { SignUpPage } from './pages/auth-pages/sign-up-page';
 import { TasksPage } from './pages/tasks-page/tasks-page';
@@ -19,6 +20,10 @@ interface AppState {
 
 export class App extends React.Component<Record<string, never>, AppState> {
 	private _apiTransport = new ApiTransport();
+	private _taskModel = new TaskViewModel({
+		apiCreateTask: this._apiTransport.createTask,
+		apiTasks: this._apiTransport.tasks,
+	});
 
 	public constructor() {
 		super({});
@@ -38,7 +43,7 @@ export class App extends React.Component<Record<string, never>, AppState> {
 				/>
 
 				<Routes>
-					<Route path='/' element={ <TasksPage /> } />
+					<Route path='/' element={ <TasksPage model={ this._taskModel } /> } />
 					<Route path='/signup' element={
 						<SignUpPage
 							signUp={ this._apiTransport.signUp }

@@ -2,6 +2,8 @@ import {
 	ApiAuthPayload,
 	ApiAuthResult,
 	ApiError,
+	ApiTask,
+	ApiCreateTaskPayload,
 } from './api-objects-and-constants';
 
 import { CredentialStorage } from './credential-storage';
@@ -39,6 +41,8 @@ export class ApiTransport {
 	private _refreshUrl = new URL('refresh', this._authUrl);
 	private _logoutUrl = new URL('logout', this._authUrl);
 
+	private _tasksUrl = new URL('tasks/', this._baseUrl);
+
 	public signUp = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
 		const authResult = await this._apiFetch<ApiAuthResult>({
 			input: this._signUpUrl,
@@ -57,24 +61,20 @@ export class ApiTransport {
 	};
 
 	public signIn = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
-		try {
-			const authResult = await this._apiFetch<ApiAuthResult>({
-				input: this._signInUrl,
-				method: HttpMethod.Post,
-				body: params,
-			});
+		const authResult = await this._apiFetch<ApiAuthResult>({
+			input: this._signInUrl,
+			method: HttpMethod.Post,
+			body: params,
+		});
 
-			if (isApiError(authResult)) {
-				throw new Error(authResult.message);
-			}
-
-			this._accessToken = authResult.tokens.accessToken;
-			this._credentialStorage.save(this._accessToken);
-
-			return authResult;
-		} catch (error: unknown) {
-			throw new Error(error as string);
+		if (isApiError(authResult)) {
+			throw new Error(authResult.message);
 		}
+
+		this._accessToken = authResult.tokens.accessToken;
+		this._credentialStorage.save(this._accessToken);
+
+		return authResult;
 	};
 
 	public async refresh(): Promise<void> {
@@ -103,6 +103,32 @@ export class ApiTransport {
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
+	};
+
+	public tasks = async (): Promise<ApiTask[]> => {
+		const tasks = await this._apiFetch<ApiTask[]>({
+			input: this._tasksUrl,
+		});
+
+		if (isApiError(tasks)) {
+			throw new Error(tasks.message);
+		}
+
+		return tasks;
+	};
+	
+	public createTask = async(payload: ApiCreateTaskPayload): Promise<ApiTask> => {
+		const task = await this._apiFetch<ApiTask>({
+			input: this._tasksUrl,
+			method: HttpMethod.Post,
+			body: payload,
+		});
+
+		if (isApiError(task)) {
+			throw new Error(task.message);
+		}
+
+		return task;
 	};
 
 	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity | ApiError> => {

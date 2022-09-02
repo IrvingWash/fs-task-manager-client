@@ -15,3 +15,21 @@ export interface ApiAuthResult {
 	},
 	username: string;
 }
+
+export interface ApiTask {
+	_id: string;
+	title: string;
+	status: ApiTaskStatus;
+	description?: string;
+}
+
+export enum ApiTaskStatus {
+	Open = 'Open',
+	Done = 'Done',
+}
+
+export interface ApiCreateTaskPayload {
+	title?: string;
+	status?: ApiTaskStatus;
+	description?: string;
+}
