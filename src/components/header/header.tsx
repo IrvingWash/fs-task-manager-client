@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import * as styles from './header.scss';
 
 export function Header(): JSX.Element {
-	const match = useLocation();
+	const { pathname } = useLocation();
 
 	return (
 		<header className={ styles.header }>
@@ -15,8 +15,13 @@ export function Header(): JSX.Element {
 			</h3>
 			<div>
 				{
-					match.pathname !== '/signup'
-						? <Link className={ styles.link } to={'/signup'}>Sign up</Link>
+					pathname !== '/signup' && pathname !== '/signin'
+						? (
+							<div>
+								<Link className={ styles.link } to={'/signup'}>Sign up</Link>
+								<Link className={ styles.link } to={'/signin'}>Sign in</Link>
+							</div>
+						)
 						: null
 				}
 			</div>

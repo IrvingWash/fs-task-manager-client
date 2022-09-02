@@ -9,6 +9,7 @@ import {
 import { ApiTransport } from './api/api-transport';
 
 import { Header } from './components/header/header';
+import { SignInPage } from './pages/sign-in-page';
 import { SignUpPage } from './pages/sign-up-page';
 
 export class App extends React.Component {
@@ -20,6 +21,7 @@ export class App extends React.Component {
 				<Header />
 				<Routes>
 					<Route path='/signup' element={ <SignUpPage singUp={ this._apiTransport.signUp } /> } />
+					<Route path='/signin' element={ <SignInPage signIn={ this._apiTransport.signIn } /> } />
 				</Routes>
 			</BrowserRouter>
 		);

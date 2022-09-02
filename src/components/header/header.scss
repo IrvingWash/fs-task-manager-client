@@ -3,9 +3,13 @@
 	justify-content: space-between;
 	padding: 10px 100px;
 	border-bottom: 1px solid gray;
-}
 
-.link {
-	text-decoration: none;
-	color: inherit;
+	.link {
+		text-decoration: none;
+		color: inherit;
+
+		&:nth-child(1) {
+			margin-right: 10px;
+		}
+	}
 }
