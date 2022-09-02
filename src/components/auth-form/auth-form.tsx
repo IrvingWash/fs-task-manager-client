@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ApiAuthPayload } from '../../api/api-objects-and-constants';
+import { ApiAuthPayload, ApiAuthResult } from '../../api/api-objects-and-constants';
 
 import * as styles from './auth-form.scss';
 
@@ -11,12 +11,20 @@ export enum AuthFormAction {
 
 interface AuthFormProps {
 	actionType: AuthFormAction;
-	action: (params: ApiAuthPayload) => Promise<void>
+	action: (params: ApiAuthPayload) => Promise<ApiAuthResult>
+	getUsername: (username: string) => void;
 }
 
 export function AuthForm(props: AuthFormProps): JSX.Element {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
+	const [error, setError] = useState<string | null>(null);
+
+	const {
+		actionType,
+		action,
+		getUsername,
+	} = props;
 
 	return (
 		<form className={ styles.authForm } onSubmit={ handleSubmit }>
@@ -30,6 +38,7 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 				minLength={ 4 }
 				value={ username }
 				onChange={ handleUsernameInput }
+				onFocus={ handleInputFocus }
 			/>
 
 			<label className={ styles.label } htmlFor='password'>Password</label>
@@ -42,14 +51,19 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 				minLength={ 6 }
 				value={ password }
 				onChange={ handlePasswordInput }
+				onFocus={ handleInputFocus }
 			/>
 
 			<button className={ styles.submitButton } type='submit'>
-				{	props.actionType === AuthFormAction.SignIn
+				{	actionType === AuthFormAction.SignIn
 						? 'Sign in'
 						: 'Sign up'
 				}
 			</button>
+
+			{ error &&
+					<div className={ styles.error }>{ error }</div>
+			}
 		</form>
 	);
 
@@ -61,9 +75,22 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 		setPassword(event.target.value);
 	}
 
+	function handleInputFocus(): void {
+		if (error !== null) {
+			setError(null);
+		}
+	}
+
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
 		event.preventDefault();
 
-		props.action({ username, password });
+		try {
+			const authorizationResult = await action({ username, password });
+
+			getUsername(authorizationResult.username);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		} catch (error: any) {
+			setError(error.message);
+		}
 	}
 }

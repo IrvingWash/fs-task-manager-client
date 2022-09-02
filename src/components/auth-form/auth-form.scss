@@ -1,6 +1,6 @@
 .authForm {
 	width: fit-content;
-	margin: 0 auto;
+	margin: 50px auto;
 
 	.label {
 		display: block;
@@ -24,5 +24,12 @@
 			background-color: gray;
 			color: white;
 		}
+	}
+
+	.error {
+		margin-top: 10px;
+		padding: 5px;
+		background-color: salmon;
+		text-align: center;
 	}
 }

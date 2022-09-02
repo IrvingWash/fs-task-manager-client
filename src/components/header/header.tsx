@@ -1,10 +1,14 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import * as styles from './header.scss';
 
-export function Header(): JSX.Element {
-	const { pathname } = useLocation();
+interface HeaderProps {
+	username: string | null;
+}
+
+export function Header(props: HeaderProps): JSX.Element {
+	const username = props.username;
 
 	return (
 		<header className={ styles.header }>
@@ -15,14 +19,14 @@ export function Header(): JSX.Element {
 			</h3>
 			<div>
 				{
-					pathname !== '/signup' && pathname !== '/signin'
+					props.username === null
 						? (
 							<div>
 								<Link className={ styles.link } to={'/signup'}>Sign up</Link>
 								<Link className={ styles.link } to={'/signin'}>Sign in</Link>
 							</div>
 						)
-						: null
+						: username
 				}
 			</div>
 		</header>

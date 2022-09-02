@@ -1,6 +1,7 @@
 import {
 	ApiAuthPayload,
-	ApiTokens,
+	ApiAuthResult,
+	ApiError,
 } from './api-objects-and-constants';
 
 import { CredentialStorage } from './credential-storage';
@@ -18,6 +19,14 @@ interface ApiFetchParams {
 	body?: object;
 }
 
+function isApiError<T>(entity: T | ApiError): entity is ApiError {
+	if ((entity as ApiError).statusCode !== undefined) {
+		return true;
+	} 
+
+	return false;
+}
+
 export class ApiTransport {
 	// TODO: Move to .env
 	private _baseUrl = new URL('http://localhost:3333/api/');
@@ -30,31 +39,39 @@ export class ApiTransport {
 	private _refreshUrl = new URL('refresh', this._authUrl);
 	private _logoutUrl = new URL('logout', this._authUrl);
 
-	public signUp = async (params: ApiAuthPayload): Promise<void> => {
-		try {
-			const tokens = await this._apiFetch<ApiTokens>({
-				input: this._signUpUrl,
-				method: HttpMethod.Post,
-				body: params,
-			});
+	public signUp = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
+		const authResult = await this._apiFetch<ApiAuthResult>({
+			input: this._signUpUrl,
+			method: HttpMethod.Post,
+			body: params,
+		});
 
-			this._accessToken = tokens.accessToken;
-			this._credentialStorage.save(tokens.accessToken);
-		} catch (error: unknown) {
-			throw new Error(error as string);
+		if (isApiError(authResult)) {
+			throw new Error(authResult.message);
 		}
+
+		this._accessToken = authResult.tokens.accessToken;
+		this._credentialStorage.save(this._accessToken);
+
+		return authResult;
 	};
 
-	public signIn = async (params: ApiAuthPayload): Promise<void> => {
+	public signIn = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
 		try {
-			const tokens = await this._apiFetch<ApiTokens>({
+			const authResult = await this._apiFetch<ApiAuthResult>({
 				input: this._signInUrl,
 				method: HttpMethod.Post,
 				body: params,
 			});
 
-			this._accessToken = tokens.accessToken;
-			this._credentialStorage.save(tokens.accessToken);
+			if (isApiError(authResult)) {
+				throw new Error(authResult.message);
+			}
+
+			this._accessToken = authResult.tokens.accessToken;
+			this._credentialStorage.save(this._accessToken);
+
+			return authResult;
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
@@ -62,11 +79,15 @@ export class ApiTransport {
 
 	public async refresh(): Promise<void> {
 		try {
-			const tokens = await this._apiFetch<ApiTokens>({
+			const authResult = await this._apiFetch<ApiAuthResult>({
 				input: this._refreshUrl,
 			});
 
-			this._credentialStorage.save(tokens.accessToken);
+			if (isApiError(authResult)) {
+				throw new Error(authResult.message);
+			}
+
+			this._credentialStorage.save(authResult.tokens.accessToken);
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
@@ -84,7 +105,7 @@ export class ApiTransport {
 		}
 	}
 
-	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity> => {
+	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity | ApiError> => {
 		const {
 			input,
 			method = HttpMethod.Get,

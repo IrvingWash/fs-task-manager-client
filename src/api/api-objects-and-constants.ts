@@ -3,7 +3,15 @@ export interface ApiAuthPayload {
 	password: string;
 }
 
-export interface ApiTokens {
-	accessToken: string;
-	refreshToken: string;
+export interface ApiError {
+	statusCode: number;
+	message: string;
+}
+
+export interface ApiAuthResult {
+	tokens: {
+		accessToken: string;
+		refreshToken: string;
+	},
+	username: string;
 }
