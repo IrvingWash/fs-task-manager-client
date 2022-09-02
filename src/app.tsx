@@ -11,6 +11,7 @@ import { ApiTransport } from './api/api-transport';
 import { Header } from './components/header/header';
 import { SignInPage } from './pages/auth-pages/sign-in-page';
 import { SignUpPage } from './pages/auth-pages/sign-up-page';
+import { TasksPage } from './pages/tasks-page/tasks-page';
 
 interface AppState {
 	username: string | null;
@@ -37,6 +38,7 @@ export class App extends React.Component<Record<string, never>, AppState> {
 				/>
 
 				<Routes>
+					<Route path='/' element={ <TasksPage /> } />
 					<Route path='/signup' element={
 						<SignUpPage
 							signUp={ this._apiTransport.signUp }
