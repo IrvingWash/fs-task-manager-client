@@ -20,17 +20,17 @@ interface ApiFetchParams {
 
 export class ApiTransport {
 	// TODO: Move to .env
-	private _baseUrl = new URL('http://localhost:3333/api');
+	private _baseUrl = new URL('http://localhost:3333/api/');
 	private _credentialStorage = new CredentialStorage();
 	private _accessToken = this._credentialStorage.get();
 
-	private _authUrl = new URL('auth', this._baseUrl);
+	private _authUrl = new URL('auth/', this._baseUrl);
 	private _signInUrl = new URL('signin', this._authUrl);
 	private _signUpUrl = new URL('signup', this._authUrl);
 	private _refreshUrl = new URL('refresh', this._authUrl);
 	private _logoutUrl = new URL('logout', this._authUrl);
 
-	public async signUp(params: ApiAuthPayload): Promise<void> {
+	public signUp = async (params: ApiAuthPayload): Promise<void> => {
 		try {
 			const tokens = await this._apiFetch<ApiTokens>({
 				input: this._signUpUrl,
@@ -43,9 +43,9 @@ export class ApiTransport {
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
-	}
+	};
 
-	public async signIn(params: ApiAuthPayload): Promise<void> {
+	public signIn = async (params: ApiAuthPayload): Promise<void> => {
 		try {
 			const tokens = await this._apiFetch<ApiTokens>({
 				input: this._signInUrl,
@@ -58,7 +58,7 @@ export class ApiTransport {
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
-	}
+	};
 
 	public async refresh(): Promise<void> {
 		try {
@@ -84,7 +84,7 @@ export class ApiTransport {
 		}
 	}
 
-	private async _apiFetch<ApiEntity>(params: ApiFetchParams): Promise<ApiEntity> {
+	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity> => {
 		const {
 			input,
 			method = HttpMethod.Get,
@@ -106,5 +106,5 @@ export class ApiTransport {
 		);
 
 		return await response.json();
-	}
+	};
 }

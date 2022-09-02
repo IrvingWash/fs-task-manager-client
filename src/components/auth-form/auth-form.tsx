@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 
+import { ApiAuthPayload } from '../../api/api-objects-and-constants';
+
+import * as styles from './auth-form.scss';
+
 export enum AuthFormAction {
 	SignUp = 'Sign up',
 	SignIn = 'Sign in',
 }
 
 interface AuthFormProps {
-	action: AuthFormAction;
+	actionType: AuthFormAction;
+	action: (params: ApiAuthPayload) => Promise<void>
 }
 
 export function AuthForm(props: AuthFormProps): JSX.Element {
@@ -14,29 +19,33 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 	const [password, setPassword] = useState('');
 
 	return (
-		<form>
-			<label htmlFor='username'>Username</label>
+		<form className={ styles.authForm } onSubmit={ handleSubmit }>
+			<label className={ styles.label } htmlFor='username'>Username</label>
 			<input
+				className={ styles.formInput }
 				type='text'
 				placeholder='Username'
 				name='username'
+				required
 				minLength={ 4 }
 				value={ username }
 				onChange={ handleUsernameInput }
 			/>
 
-			<label htmlFor='password'>Password</label>
+			<label className={ styles.label } htmlFor='password'>Password</label>
 			<input
+				className={ styles.formInput }
 				type='password'
 				placeholder='Password'
 				name='password'
+				required
 				minLength={ 6 }
 				value={ password }
 				onChange={ handlePasswordInput }
 			/>
 
-			<button type='submit'>
-				{	props.action === AuthFormAction.SignIn
+			<button className={ styles.submitButton } type='submit'>
+				{	props.actionType === AuthFormAction.SignIn
 						? 'Sign in'
 						: 'Sign up'
 				}
@@ -50,5 +59,11 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 
 	function handlePasswordInput(event: React.ChangeEvent<HTMLInputElement>): void {
 		setPassword(event.target.value);
+	}
+
+	async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+		event.preventDefault();
+
+		props.action({ username, password });
 	}
 }

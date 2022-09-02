@@ -1,6 +1,11 @@
 .header {
 	display: flex;
 	justify-content: space-between;
-	padding: 10px 50px;
+	padding: 10px 100px;
 	border-bottom: 1px solid gray;
+}
+
+.link {
+	text-decoration: none;
+	color: inherit;
 }
