@@ -9,8 +9,8 @@ import {
 import { ApiTransport } from './api/api-transport';
 
 import { Header } from './components/header/header';
-import { SignInPage } from './pages/sign-in-page';
-import { SignUpPage } from './pages/sign-up-page';
+import { SignInPage } from './pages/auth-pages/sign-in-page';
+import { SignUpPage } from './pages/auth-pages/sign-up-page';
 
 export class App extends React.Component {
 	private _apiTransport = new ApiTransport();

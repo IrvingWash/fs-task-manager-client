@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ApiAuthPayload } from '../api/api-objects-and-constants';
-import { AuthForm, AuthFormAction } from '../components/auth-form/auth-form';
+import { ApiAuthPayload } from '../../api/api-objects-and-constants';
+import { AuthForm, AuthFormAction } from '../../components/auth-form/auth-form';
 
 interface SignUpPageProps {
 	singUp: (params: ApiAuthPayload) => Promise<void>;
