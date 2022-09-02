@@ -22,11 +22,13 @@ export class ApiTransport {
 	// TODO: Move to .env
 	private _baseUrl = new URL('http://localhost:3333/api');
 	private _credentialStorage = new CredentialStorage();
+	private _accessToken = this._credentialStorage.get();
 
-	private _authBaseUrl = new URL('auth', this._baseUrl);
-	private _signInUrl = new URL('signin', this._authBaseUrl);
-	private _signUpUrl = new URL('signup', this._authBaseUrl);
-	private _refreshUrl = new URL('refresh', this._authBaseUrl);
+	private _authUrl = new URL('auth', this._baseUrl);
+	private _signInUrl = new URL('signin', this._authUrl);
+	private _signUpUrl = new URL('signup', this._authUrl);
+	private _refreshUrl = new URL('refresh', this._authUrl);
+	private _logoutUrl = new URL('logout', this._authUrl);
 
 	public async signUp(params: ApiAuthPayload): Promise<void> {
 		try {
@@ -36,6 +38,7 @@ export class ApiTransport {
 				body: params,
 			});
 
+			this._accessToken = tokens.accessToken;
 			this._credentialStorage.save(tokens.accessToken);
 		} catch (error: unknown) {
 			throw new Error(error as string);
@@ -50,6 +53,7 @@ export class ApiTransport {
 				body: params,
 			});
 
+			this._accessToken = tokens.accessToken;
 			this._credentialStorage.save(tokens.accessToken);
 		} catch (error: unknown) {
 			throw new Error(error as string);
@@ -63,6 +67,18 @@ export class ApiTransport {
 			});
 
 			this._credentialStorage.save(tokens.accessToken);
+		} catch (error: unknown) {
+			throw new Error(error as string);
+		}
+	}
+
+	public async logout(): Promise<void> {
+		try {
+			await this._apiFetch({
+				input: this._logoutUrl,
+			});
+
+			this._credentialStorage.clear();
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
@@ -82,6 +98,9 @@ export class ApiTransport {
 				method,
 				headers: {
 					'Content-Type': 'application/json',
+					'Authorization': this._accessToken !== null
+						? `Bearer ${this._accessToken}`
+						: '',
 				},
 			}
 		);
