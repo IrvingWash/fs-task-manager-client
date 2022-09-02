@@ -19,7 +19,21 @@ interface ApiFetchParams {
 export class ApiTransport {
 	// TODO: Move to .env
 	private _baseUrl = new URL('http://localhost:3333/api');
+
 	private _signInUrl = new URL('signin', this._baseUrl);
+	private _signUpUrl = new URL('signup', this._baseUrl);
+
+	public async signUp(params: ApiAuthPayload): Promise<ApiTokens> {
+		try {
+			return await this._apiFetch({
+				input: this._signUpUrl,
+				method: HttpMethod.Post,
+				body: params,
+			});
+		} catch (error: unknown) {
+			throw new Error(error as string);
+		}
+	}
 
 	public async signIn(params: ApiAuthPayload): Promise<ApiTokens> {
 		try {
