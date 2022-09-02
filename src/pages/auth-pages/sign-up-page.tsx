@@ -5,15 +5,15 @@ import { AuthForm, AuthFormAction } from '../../components/auth-form/auth-form';
 
 interface SignUpPageProps {
 	signUp: (params: ApiAuthPayload) => Promise<ApiAuthResult>;
-	getUsername: (username: string) => void;
+	updateUsername: (username: string) => void;
 }
 
 export function SignUpPage(props: SignUpPageProps): JSX.Element {
-	const { signUp, getUsername } = props;
+	const { signUp, updateUsername } = props;
 
 	return (
 		<main>
-			<AuthForm actionType={ AuthFormAction.SignUp } action={ signUp } getUsername={ getUsername } />
+			<AuthForm actionType={ AuthFormAction.SignUp } action={ signUp } updateUsername={ updateUsername } />
 		</main>
 	);
 }

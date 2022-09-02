@@ -30,18 +30,31 @@ export class App extends React.Component<Record<string, never>, AppState> {
 	public override render(): JSX.Element {
 		return (
 			<BrowserRouter>
-				<Header username={ this.state.username } />
+				<Header 
+					username={ this.state.username }
+					logout={ this._apiTransport.logout }
+					updateUsername={ this._updateUsername }
+				/>
+
 				<Routes>
-					<Route path='/signup' element={ <SignUpPage signUp={ this._apiTransport.signUp } getUsername={ this._getUsername } /> } />
-					<Route path='/signin' element={ <SignInPage signIn={ this._apiTransport.signIn } getUsername={ this._getUsername } /> } />
+					<Route path='/signup' element={
+						<SignUpPage
+							signUp={ this._apiTransport.signUp }
+							updateUsername={ this._updateUsername }
+						/>
+					} />
+					<Route path='/signin' element={
+						<SignInPage
+							signIn={ this._apiTransport.signIn }
+							updateUsername={ this._updateUsername }
+						/>
+					} />
 				</Routes>
 			</BrowserRouter>
 		);
 	}
 
-	private _getUsername = (username: string): void => {
-		console.log(username);
-
+	private _updateUsername = (username: string | null): void => {
 		this.setState({
 			username,
 		});

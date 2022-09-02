@@ -1,14 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import * as styles from './header.scss';
 
 interface HeaderProps {
 	username: string | null;
+	updateUsername: (username: string | null) => void;
+	logout: () => Promise<void>;
 }
 
 export function Header(props: HeaderProps): JSX.Element {
-	const username = props.username;
+	const navigate = useNavigate();
+
+	const {
+		username,
+		updateUsername,
+		logout,
+	} = props;
 
 	return (
 		<header className={ styles.header }>
@@ -17,18 +25,35 @@ export function Header(props: HeaderProps): JSX.Element {
 					Task manager
 				</Link>
 			</h3>
-			<div>
-				{
-					props.username === null
-						? (
-							<div>
-								<Link className={ styles.link } to={'/signup'}>Sign up</Link>
-								<Link className={ styles.link } to={'/signin'}>Sign in</Link>
-							</div>
-						)
-						: username
+
+			<div className={ styles.userBlock }>
+				{ username === null
+					? (
+						<>
+							<Link className={ styles.link } to={'/signup'}>Sign up</Link>
+							<Link className={ styles.link } to={'/signin'}>Sign in</Link>
+						</>
+					) : (
+						<>
+							<h4 className={ styles.username }>
+								{ username }
+							</h4>
+							<button className={ styles.logoutButton } onClick={ handleLogout }>Logout</button>
+						</>
+					)
 				}
 			</div>
 		</header>
 	);
+
+	async function handleLogout(): Promise<void> {
+		try {
+			await logout();
+		} catch (error: unknown) {
+			throw new Error(error as string);
+		}
+
+		updateUsername(null);
+		navigate('/signin');
+	}
 }

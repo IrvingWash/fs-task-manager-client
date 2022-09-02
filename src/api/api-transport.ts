@@ -93,9 +93,9 @@ export class ApiTransport {
 		}
 	}
 
-	public async logout(): Promise<void> {
+	public logout = async (): Promise<void> => {
 		try {
-			await this._apiFetch({
+			await this._apiFetch<void>({
 				input: this._logoutUrl,
 			});
 
@@ -103,7 +103,7 @@ export class ApiTransport {
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
-	}
+	};
 
 	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity | ApiError> => {
 		const {
