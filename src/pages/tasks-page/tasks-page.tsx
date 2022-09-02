@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
 import { useObservable } from '../../hooks/use-observable';
-import { ITaskViewModel } from '../../models/task-view-model';
+import { ITasksViewModel } from '../../models/tasks-view-model';
 
 interface TaskPageProps {
-	model: ITaskViewModel;
+	model: ITasksViewModel;
 }
 
 export function TasksPage(props: TaskPageProps): JSX.Element {

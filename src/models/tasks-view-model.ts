@@ -2,26 +2,26 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ApiTask, ApiCreateTaskPayload } from '../api/api-objects-and-constants';
 
-export interface ITaskViewModel {
+export interface ITasksViewModel {
 	tasks$: Observable<ApiTask[]>;
 	tasks(): ApiTask[];
 	fetchTasks(): Promise<void>;
 	createTask(payload: ApiCreateTaskPayload): Promise<void>;
 }
 
-interface TaskViewModelParams {
+interface TasksViewModelParams {
 	apiTasks: () => Promise<ApiTask[]>;
 	apiCreateTask: (payload: ApiCreateTaskPayload) => Promise<ApiTask>
 }
 
-export class TaskViewModel {
+export class TasksViewModel {
 	public readonly tasks$: Observable<ApiTask[]>;
 
 	private readonly _tasks$ = new BehaviorSubject<ApiTask[]>([]);
 	private readonly _apiTasks: () => Promise<ApiTask[]>;
 	private readonly _apiCreateTask: (payload: ApiCreateTaskPayload) => Promise<ApiTask>;
 
-	public constructor(params: TaskViewModelParams) {
+	public constructor(params: TasksViewModelParams) {
 		const { apiTasks, apiCreateTask } = params;
 
 		this.tasks$ = this._tasks$.asObservable();

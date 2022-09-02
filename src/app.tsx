@@ -9,7 +9,7 @@ import {
 import { ApiTransport } from './api/api-transport';
 
 import { Header } from './components/header/header';
-import { TaskViewModel } from './models/task-view-model';
+import { TasksViewModel } from './models/tasks-view-model';
 import { SignInPage } from './pages/auth-pages/sign-in-page';
 import { SignUpPage } from './pages/auth-pages/sign-up-page';
 import { TasksPage } from './pages/tasks-page/tasks-page';
@@ -20,7 +20,7 @@ interface AppState {
 
 export class App extends React.Component<Record<string, never>, AppState> {
 	private _apiTransport = new ApiTransport();
-	private _taskModel = new TaskViewModel({
+	private _taskModel = new TasksViewModel({
 		apiCreateTask: this._apiTransport.createTask,
 		apiTasks: this._apiTransport.tasks,
 	});
