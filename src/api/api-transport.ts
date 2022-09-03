@@ -99,6 +99,7 @@ export class ApiTransport {
 				input: this._logoutUrl,
 			});
 
+			this._accessToken = null;
 			this._credentialStorage.clear();
 		} catch (error: unknown) {
 			throw new Error(error as string);
