@@ -68,7 +68,7 @@ export function Task(props: TaskProps): JSX.Element {
 				</button>
 
 				{	actionType === TaskActionType.Update && (
-					<button className={ classnames(styles.button, styles.deleteButton) } onClick={ handleDelete }>
+					<button type='button' className={ classnames(styles.button, styles.deleteButton) } onClick={ handleDelete }>
 						Delete
 					</button>
 				)	}
