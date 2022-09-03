@@ -12,6 +12,7 @@ export function SignUpPage(props: SignUpPageProps): JSX.Element {
 
 	return (
 		<main>
+			<h1>Sign up</h1>
 			<AuthForm
 				actionType={ AuthFormAction.SignUp }
 				action={ signUp }

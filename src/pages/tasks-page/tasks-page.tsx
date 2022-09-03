@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Task, TaskActionType } from '../../components/task/task';
 import { useObservable } from '../../hooks/use-observable';
@@ -13,8 +13,10 @@ interface TaskPageProps {
 export function TasksPage(props: TaskPageProps): JSX.Element {
 	const { model } = props;
 
+	const [ error, setError ] = useState<string | null>(null);
+
 	useEffect(() => {
-		model.fetchTasks();
+		getTasks();
 	}, []);
 
 	const tasks = useObservable(model.tasks$, model.tasks());
@@ -34,6 +36,10 @@ export function TasksPage(props: TaskPageProps): JSX.Element {
 		);
 	});
 
+	if (error !== null) {
+		return <p>Unauthorized</p>;
+	}
+
 	return (
 		<main className={ styles.tasksPage }>
 			<div className={ styles.newTask }>
@@ -43,4 +49,12 @@ export function TasksPage(props: TaskPageProps): JSX.Element {
 			{ tasksContent }
 		</main>
 	);
+
+	async function getTasks(): Promise<void> {
+		try {
+			await model.fetchTasks();
+		} catch {
+			setError('Unauthorized');
+		}
+	}
 }

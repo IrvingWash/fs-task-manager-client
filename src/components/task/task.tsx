@@ -29,13 +29,20 @@ export function Task(props: TaskProps): JSX.Element {
 	const [status, setStatus] = useState(props.status ?? ApiTaskStatus.Open);
 
 	return (
-		<div className={ styles.task }>
+		<form
+			className={ styles.task }
+			onSubmit={ actionType === TaskActionType.Create
+				? handleCreate
+				: handleUpdate
+			}
+		>
 			<input
 				type='text'
 				className={ classnames(styles.input, styles.title) }
 				placeholder='Title'
 				value={ title }
 				onChange={ handleTitleInput }
+				required={ actionType === TaskActionType.Create }
 			/>
 
 			<input
@@ -46,30 +53,27 @@ export function Task(props: TaskProps): JSX.Element {
 				onChange={ handleDescriptionInput }
 			/>
 
-			<select
-				className={ styles.status }
-				defaultValue={ status }
-				onChange={ handleStatusSelect }
-			>
-				<option value={ ApiTaskStatus.Open }>Open</option>
-				<option value={ ApiTaskStatus.Done }>Done</option>
-			</select>
+			<div className={ styles.control }>
+				<select
+					className={ styles.status }
+					defaultValue={ status }
+					onChange={ handleStatusSelect }
+				>
+					<option value={ ApiTaskStatus.Open }>Open</option>
+					<option value={ ApiTaskStatus.Done }>Done</option>
+				</select>
 
-			<button
-				onClick={ actionType === TaskActionType.Create
-					? handleCreate
-					: handleUpdate
-				}
-			>
-				{actionType}
-			</button>
-
-			{	actionType === TaskActionType.Update && (
-				<button onClick={ handleDelete }>
-					Delete
+				<button className={ classnames(styles.button, styles.submitButton) } type='submit'>
+					{actionType}
 				</button>
-			)	}
-		</div>
+
+				{	actionType === TaskActionType.Update && (
+					<button className={ classnames(styles.button, styles.deleteButton) } onClick={ handleDelete }>
+						Delete
+					</button>
+				)	}
+			</div>
+		</form>
 	);
 
 	function handleTitleInput(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -84,7 +88,9 @@ export function Task(props: TaskProps): JSX.Element {
 		setStatus(event.target.value as ApiTaskStatus);
 	}
 
-	async function handleCreate(): Promise<void> {
+	async function handleCreate(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+		event.preventDefault();
+
 		await props.createTask?.({
 			title,
 			description,

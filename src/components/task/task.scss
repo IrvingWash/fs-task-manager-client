@@ -1,6 +1,6 @@
 .task {
 	width: 400px;
-	margin: 0 auto;
+	margin: 0 auto 20px;
 	padding: 10px;
 	border: 1px solid gray;
 	border-radius: 4px;
@@ -27,6 +27,28 @@
 	}
 
 	.status {
-		margin-top: 10px;
+		color: black;
+	}
+
+	.control {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 10px 0;
+	}
+
+	.button {
+		padding: 5px;
+		border: none;
+		color: white;
+		cursor: pointer;
+	}
+
+	.submitButton {
+		background-color: cadetblue;
+	}
+
+	.deleteButton {
+		background-color: salmon;
 	}
 }

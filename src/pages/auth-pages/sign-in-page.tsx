@@ -12,7 +12,11 @@ export function SignInPage(props: SignInPageProps): JSX.Element {
 
 	return (
 		<main>
-			<AuthForm actionType={ AuthFormAction.SignIn } action={ signIn } />
+			<h1>Sign in</h1>
+			<AuthForm
+				actionType={ AuthFormAction.SignIn }
+				action={ signIn }
+			/>
 		</main>
 	);
 }

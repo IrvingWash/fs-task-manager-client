@@ -41,7 +41,6 @@ export class App extends React.Component<Record<string, never>, AppState> {
 		});
 
 		this._taskModel = new TasksViewModel(this._apiTransport);
-
 	}
 
 	public override render(): JSX.Element {
