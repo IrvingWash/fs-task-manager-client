@@ -22,8 +22,9 @@ export function TasksPage(props: TaskPageProps): JSX.Element {
 	const tasksContent = tasks.map((task) => {
 		return (
 			<Task
+				id = { task._id }
 				actionType={ TaskActionType.Update }
-				action={ async (): Promise<void> => { return; }}
+				updateTask={ model.updateTask }
 				title={ task.title }
 				description={ task.description }
 				status={ task.status }
@@ -34,9 +35,9 @@ export function TasksPage(props: TaskPageProps): JSX.Element {
 
 	return (
 		<main className={ styles.tasksPage }>
-			<div>
+			<div className={ styles.newTask }>
 				<h2>New task</h2>
-				<Task actionType={ TaskActionType.Create } action={ model.createTask } />
+				<Task actionType={ TaskActionType.Create } createTask={ model.createTask } />
 			</div>
 			{ tasksContent }
 		</main>

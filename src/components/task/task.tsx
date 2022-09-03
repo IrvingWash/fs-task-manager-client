@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classnames from 'classnames';
 
-import { ApiCreateTaskPayload, ApiTaskStatus } from '../../api/api-objects-and-constants';
+import { ApiTaskPayload, ApiTaskStatus } from '../../api/api-objects-and-constants';
 
 import * as styles from './task.scss';
 
@@ -12,7 +12,9 @@ export enum TaskActionType {
 
 interface TaskProps {
 	actionType: TaskActionType;
-	action: (payload: ApiCreateTaskPayload) => Promise<void>;
+	createTask?: (payload: ApiTaskPayload) => Promise<void>;
+	updateTask?: (id: string, payload: ApiTaskPayload) => Promise<void>;
+	id?: string;
 	title?: string;
 	status?: ApiTaskStatus;
 	description?: string;
@@ -51,7 +53,10 @@ export function Task(props: TaskProps): JSX.Element {
 			</select>
 
 			<button
-				onClick={ handleCreate }
+				onClick={ props.actionType === TaskActionType.Create
+					? handleCreate
+					: handleUpdate
+				}
 			>
 				{props.actionType}
 			</button>
@@ -71,7 +76,7 @@ export function Task(props: TaskProps): JSX.Element {
 	}
 
 	async function handleCreate(): Promise<void> {
-		await props.action({
+		await props.createTask?.({
 			title,
 			description,
 			status,
@@ -80,5 +85,16 @@ export function Task(props: TaskProps): JSX.Element {
 		setTitle('');
 		setDescription('');
 		setStatus(ApiTaskStatus.Open);
+	}
+
+	async function handleUpdate(): Promise<void> {
+		await props.updateTask?.(
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			props.id!,
+			{
+			title,
+			description,
+			status,
+		});
 	}
 }

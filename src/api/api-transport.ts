@@ -3,7 +3,7 @@ import {
 	ApiAuthResult,
 	ApiError,
 	ApiTask,
-	ApiCreateTaskPayload,
+	ApiTaskPayload,
 } from './api-objects-and-constants';
 
 import { CredentialStorage } from './credential-storage';
@@ -116,8 +116,22 @@ export class ApiTransport {
 
 		return tasks;
 	};
+
+	public updateTask = async (id: string, payload: ApiTaskPayload): Promise<ApiTask> => {
+		const updatedTask = await this._apiFetch<ApiTask>({
+			input: new URL(id, this._tasksUrl),
+			method: HttpMethod.Patch,
+			body: payload,
+		});
+
+		if (isApiError(updatedTask)) {
+			throw new Error(updatedTask.message);
+		}
+
+		return updatedTask;
+	};
 	
-	public createTask = async(payload: ApiCreateTaskPayload): Promise<ApiTask> => {
+	public createTask = async(payload: ApiTaskPayload): Promise<ApiTask> => {
 		const task = await this._apiFetch<ApiTask>({
 			input: this._tasksUrl,
 			method: HttpMethod.Post,

@@ -28,7 +28,7 @@ export enum ApiTaskStatus {
 	Done = 'Done',
 }
 
-export interface ApiCreateTaskPayload {
+export interface ApiTaskPayload {
 	title?: string;
 	status?: ApiTaskStatus;
 	description?: string;

@@ -23,6 +23,7 @@ export class App extends React.Component<Record<string, never>, AppState> {
 	private _taskModel = new TasksViewModel({
 		apiCreateTask: this._apiTransport.createTask,
 		apiTasks: this._apiTransport.tasks,
+		apiUpdateTask: this._apiTransport.updateTask,
 	});
 
 	public constructor() {
