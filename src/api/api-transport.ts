@@ -171,7 +171,7 @@ export class ApiTransport {
 			body,
 		} = params;
 
-		const accessToken = this._credentialStorage.get();
+		const credentials = this._credentialStorage.get();
 
 		const response = await fetch(
 			input,
@@ -180,8 +180,8 @@ export class ApiTransport {
 				method,
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': accessToken !== null
-						? `Bearer ${accessToken}`
+					'Authorization': credentials?.accessToken !== null
+						? `Bearer ${credentials?.accessToken}`
 						: '',
 				},
 			}

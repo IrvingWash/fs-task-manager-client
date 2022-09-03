@@ -5,7 +5,7 @@ import { CredentialStorage } from '../api/credential-storage';
 interface AuthParams {
 	apiTransport: ApiTransport;
 	credentialStorage: CredentialStorage;
-	updateUsername: (usename: string) => void;
+	updateUsername: (username: string) => void;
 }
 
 export class Auth {
@@ -40,7 +40,9 @@ export class Auth {
 	public refresh = async (): Promise<void> => {
 		const authResult = await this._apiTransport.refresh();
 
-		this._credentialStorage.save(authResult.accessToken);
+		const credentials = this._credentialStorage.get();
+
+		this._credentialStorage.save(credentials?.username ?? '', authResult.accessToken);
 	};
 
 	public logout = async (): Promise<void> => {
@@ -51,6 +53,6 @@ export class Auth {
 
 	private _onAuthorized = (authResult: ApiAuthResult): void => {
 		this._updateUsername(authResult.username);
-		this._credentialStorage.save(authResult.tokens.accessToken);
+		this._credentialStorage.save(authResult.username, authResult.tokens.accessToken);
 	};
 }

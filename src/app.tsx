@@ -29,7 +29,7 @@ export class App extends React.Component<Record<string, never>, AppState> {
 		super({});
 
 		this.state = {
-			username: null,
+			username: this._credentialStorage.get()?.username ?? null,
 		};
 
 		this._apiTransport = new ApiTransport(this._credentialStorage);
