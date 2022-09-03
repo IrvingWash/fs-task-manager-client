@@ -20,10 +20,12 @@ interface AppState {
 
 export class App extends React.Component<Record<string, never>, AppState> {
 	private _apiTransport = new ApiTransport();
+
 	private _taskModel = new TasksViewModel({
 		apiCreateTask: this._apiTransport.createTask,
 		apiTasks: this._apiTransport.tasks,
 		apiUpdateTask: this._apiTransport.updateTask,
+		apiDeleteTask: this._apiTransport.deleteTask,
 	});
 
 	public constructor() {

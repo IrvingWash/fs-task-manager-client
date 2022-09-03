@@ -8,33 +8,38 @@ export interface ITasksViewModel {
 	fetchTasks(): Promise<void>;
 	createTask(payload: ApiTaskPayload): Promise<void>;
 	updateTask(id: string, payload: ApiTaskPayload): Promise<void>;
+	deleteTask(id: string): Promise<void>;
 }
 
 interface TasksViewModelParams {
 	apiTasks: () => Promise<ApiTask[]>;
 	apiCreateTask: (payload: ApiTaskPayload) => Promise<ApiTask>;
 	apiUpdateTask: (id: string, payload: ApiTaskPayload) => Promise<ApiTask>;
+	apiDeleteTask: (id: string) => Promise<ApiTask>;
 }
 
-export class TasksViewModel {
+export class TasksViewModel implements ITasksViewModel {
 	public readonly tasks$: Observable<ApiTask[]>;
 
 	private readonly _tasks$ = new BehaviorSubject<ApiTask[]>([]);
 	private readonly _apiTasks: () => Promise<ApiTask[]>;
 	private readonly _apiCreateTask: (payload: ApiTaskPayload) => Promise<ApiTask>;
 	private readonly _apiUpdateTask: (id: string, payload: ApiTaskPayload) => Promise<ApiTask>;
+	private readonly _apiDeleteTask: (id: string) => Promise<ApiTask>;
 
 	public constructor(params: TasksViewModelParams) {
 		const {
 			apiTasks,
 			apiCreateTask,
 			apiUpdateTask,
+			apiDeleteTask,
 		} = params;
 
 		this.tasks$ = this._tasks$.asObservable();
 		this._apiTasks = apiTasks;
 		this._apiCreateTask = apiCreateTask;
 		this._apiUpdateTask = apiUpdateTask;
+		this._apiDeleteTask = apiDeleteTask;
 	}
 
 	public tasks = (): ApiTask[] => {
@@ -65,6 +70,7 @@ export class TasksViewModel {
 	public updateTask = async (id: string, payload: ApiTaskPayload): Promise<void> => {
 		try {
 			const updatedTask = await this._apiUpdateTask(id, payload);
+
 			const currentTasks = this.tasks();
 			
 			const filteredTasks = currentTasks.filter((task) => task._id !== updatedTask._id);
@@ -72,6 +78,20 @@ export class TasksViewModel {
 			this._tasks$.next([updatedTask, ...filteredTasks]);
 		} catch {
 			throw new Error('Failed to update task');
+		}
+	};
+
+	public deleteTask = async (id: string): Promise<void> => {
+		try {
+			const deletedTask = await this._apiDeleteTask(id);
+
+			const currentTasks = this.tasks();
+
+			const filteredTasks = currentTasks.filter((task) => task._id !== deletedTask._id);
+
+			this._tasks$.next([...filteredTasks]);
+		} catch {
+			throw new Error('Failed to delete task');
 		}
 	};
 }

@@ -131,7 +131,7 @@ export class ApiTransport {
 		return updatedTask;
 	};
 	
-	public createTask = async(payload: ApiTaskPayload): Promise<ApiTask> => {
+	public createTask = async (payload: ApiTaskPayload): Promise<ApiTask> => {
 		const task = await this._apiFetch<ApiTask>({
 			input: this._tasksUrl,
 			method: HttpMethod.Post,
@@ -143,6 +143,19 @@ export class ApiTransport {
 		}
 
 		return task;
+	};
+
+	public deleteTask = async (id: string): Promise<ApiTask> => {
+		const deletedTask = await this._apiFetch<ApiTask>({
+			input: new URL(id, this._tasksUrl),
+			method: HttpMethod.Delete,
+		});
+
+		if (isApiError(deletedTask)) {
+			throw new Error(deletedTask.message);
+		}
+
+		return deletedTask;
 	};
 
 	private _apiFetch = async <ApiEntity>(params: ApiFetchParams): Promise<ApiEntity | ApiError> => {

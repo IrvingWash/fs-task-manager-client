@@ -12,15 +12,18 @@ export enum TaskActionType {
 
 interface TaskProps {
 	actionType: TaskActionType;
-	createTask?: (payload: ApiTaskPayload) => Promise<void>;
-	updateTask?: (id: string, payload: ApiTaskPayload) => Promise<void>;
 	id?: string;
 	title?: string;
 	status?: ApiTaskStatus;
 	description?: string;
+	createTask?: (payload: ApiTaskPayload) => Promise<void>;
+	updateTask?: (id: string, payload: ApiTaskPayload) => Promise<void>;
+	deleteTask?: (id: string) => Promise<void>;
 }
 
 export function Task(props: TaskProps): JSX.Element {
+	const { actionType } = props;
+
 	const [title, setTitle] = useState(props.title ?? '');
 	const [description, setDescription] = useState(props.description ?? '');
 	const [status, setStatus] = useState(props.status ?? ApiTaskStatus.Open);
@@ -53,13 +56,19 @@ export function Task(props: TaskProps): JSX.Element {
 			</select>
 
 			<button
-				onClick={ props.actionType === TaskActionType.Create
+				onClick={ actionType === TaskActionType.Create
 					? handleCreate
 					: handleUpdate
 				}
 			>
-				{props.actionType}
+				{actionType}
 			</button>
+
+			{	actionType === TaskActionType.Update && (
+				<button onClick={ handleDelete }>
+					Delete
+				</button>
+			)	}
 		</div>
 	);
 
@@ -96,5 +105,10 @@ export function Task(props: TaskProps): JSX.Element {
 			description,
 			status,
 		});
+	}
+
+	async function handleDelete(): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		await props.deleteTask?.(props.id!);
 	}
 }

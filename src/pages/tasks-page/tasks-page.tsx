@@ -25,6 +25,7 @@ export function TasksPage(props: TaskPageProps): JSX.Element {
 				id = { task._id }
 				actionType={ TaskActionType.Update }
 				updateTask={ model.updateTask }
+				deleteTask={ model.deleteTask }
 				title={ task.title }
 				description={ task.description }
 				status={ task.status }
