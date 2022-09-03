@@ -4,6 +4,7 @@ import {
 	ApiError,
 	ApiTask,
 	ApiTaskPayload,
+	ApiTokens,
 } from './api-objects-and-constants';
 
 import { CredentialStorage } from './credential-storage';
@@ -13,6 +14,20 @@ export enum HttpMethod {
 	Post = 'POST',
 	Patch = 'PATCH',
 	Delete = 'DELETE',
+}
+
+export interface IApiAuthTransport {
+	signUp: (payload: ApiAuthPayload) => Promise<ApiAuthResult>;
+	signIn: (payload: ApiAuthPayload) => Promise<ApiAuthResult>;
+	refresh: () => Promise<ApiTokens>;
+	logout: () => Promise<void>;
+}
+
+export interface IApiTasksTransport {
+	tasks: () => Promise<ApiTask[]>;
+	updateTask: (id: string, payload: ApiTaskPayload) => Promise<ApiTask>;
+	createTask: (payload: ApiTaskPayload) => Promise<ApiTask>;
+	deleteTask: (id: string) => Promise<ApiTask>;
 }
 
 interface ApiFetchParams {
@@ -32,8 +47,7 @@ function isApiError<T>(entity: T | ApiError): entity is ApiError {
 export class ApiTransport {
 	// TODO: Move to .env
 	private _baseUrl = new URL('http://localhost:3333/api/');
-	private _credentialStorage = new CredentialStorage();
-	private _accessToken = this._credentialStorage.get();
+	private _credentialStorage: CredentialStorage;
 
 	private _authUrl = new URL('auth/', this._baseUrl);
 	private _signInUrl = new URL('signin', this._authUrl);
@@ -43,54 +57,48 @@ export class ApiTransport {
 
 	private _tasksUrl = new URL('tasks/', this._baseUrl);
 
-	public signUp = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
+	public constructor(credentialStorage: CredentialStorage) {
+		this._credentialStorage = credentialStorage;
+	}
+
+	public signUp = async (payload: ApiAuthPayload): Promise<ApiAuthResult> => {
 		const authResult = await this._apiFetch<ApiAuthResult>({
 			input: this._signUpUrl,
 			method: HttpMethod.Post,
-			body: params,
+			body: payload,
 		});
 
 		if (isApiError(authResult)) {
 			throw new Error(authResult.message);
 		}
 
-		this._accessToken = authResult.tokens.accessToken;
-		this._credentialStorage.save(this._accessToken);
-
 		return authResult;
 	};
 
-	public signIn = async (params: ApiAuthPayload): Promise<ApiAuthResult> => {
+	public signIn = async (payload: ApiAuthPayload): Promise<ApiAuthResult> => {
 		const authResult = await this._apiFetch<ApiAuthResult>({
 			input: this._signInUrl,
 			method: HttpMethod.Post,
-			body: params,
+			body: payload,
 		});
 
 		if (isApiError(authResult)) {
 			throw new Error(authResult.message);
 		}
 
-		this._accessToken = authResult.tokens.accessToken;
-		this._credentialStorage.save(this._accessToken);
-
 		return authResult;
 	};
 
-	public async refresh(): Promise<void> {
-		try {
-			const authResult = await this._apiFetch<ApiAuthResult>({
-				input: this._refreshUrl,
-			});
+	public async refresh(): Promise<ApiTokens> {
+		const authResult = await this._apiFetch<ApiTokens>({
+			input: this._refreshUrl,
+		});
 
-			if (isApiError(authResult)) {
-				throw new Error(authResult.message);
-			}
-
-			this._credentialStorage.save(authResult.tokens.accessToken);
-		} catch (error: unknown) {
-			throw new Error(error as string);
+		if (isApiError(authResult)) {
+			throw new Error(authResult.message);
 		}
+
+		return authResult;
 	}
 
 	public logout = async (): Promise<void> => {
@@ -98,9 +106,6 @@ export class ApiTransport {
 			await this._apiFetch<void>({
 				input: this._logoutUrl,
 			});
-
-			this._accessToken = null;
-			this._credentialStorage.clear();
 		} catch (error: unknown) {
 			throw new Error(error as string);
 		}
@@ -166,6 +171,8 @@ export class ApiTransport {
 			body,
 		} = params;
 
+		const accessToken = this._credentialStorage.get();
+
 		const response = await fetch(
 			input,
 			{
@@ -173,8 +180,8 @@ export class ApiTransport {
 				method,
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': this._accessToken !== null
-						? `Bearer ${this._accessToken}`
+					'Authorization': accessToken !== null
+						? `Bearer ${accessToken}`
 						: '',
 				},
 			}

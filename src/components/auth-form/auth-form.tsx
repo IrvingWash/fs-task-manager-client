@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ApiAuthPayload, ApiAuthResult } from '../../api/api-objects-and-constants';
+import { ApiAuthPayload } from '../../api/api-objects-and-constants';
 
 import * as styles from './auth-form.scss';
 
@@ -12,8 +12,7 @@ export enum AuthFormAction {
 
 interface AuthFormProps {
 	actionType: AuthFormAction;
-	action: (params: ApiAuthPayload) => Promise<ApiAuthResult>
-	updateUsername: (username: string) => void;
+	action: (params: ApiAuthPayload) => Promise<void>
 }
 
 export function AuthForm(props: AuthFormProps): JSX.Element {
@@ -26,7 +25,6 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 	const {
 		actionType,
 		action,
-		updateUsername,
 	} = props;
 
 	return (
@@ -88,10 +86,8 @@ export function AuthForm(props: AuthFormProps): JSX.Element {
 		event.preventDefault();
 
 		try {
-			const authorizationResult = await action({ username, password });
+			await action({ username, password });
 
-			updateUsername(authorizationResult.username);
-			
 			navigate('/');
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (error: any) {

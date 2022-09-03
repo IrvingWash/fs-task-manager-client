@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { ApiTask, ApiTaskPayload } from '../api/api-objects-and-constants';
+import { IApiTasksTransport } from '../api/api-transport';
 
 export interface ITasksViewModel {
 	tasks$: Observable<ApiTask[]>;
@@ -9,13 +10,6 @@ export interface ITasksViewModel {
 	createTask(payload: ApiTaskPayload): Promise<void>;
 	updateTask(id: string, payload: ApiTaskPayload): Promise<void>;
 	deleteTask(id: string): Promise<void>;
-}
-
-interface TasksViewModelParams {
-	apiTasks: () => Promise<ApiTask[]>;
-	apiCreateTask: (payload: ApiTaskPayload) => Promise<ApiTask>;
-	apiUpdateTask: (id: string, payload: ApiTaskPayload) => Promise<ApiTask>;
-	apiDeleteTask: (id: string) => Promise<ApiTask>;
 }
 
 export class TasksViewModel implements ITasksViewModel {
@@ -27,19 +21,12 @@ export class TasksViewModel implements ITasksViewModel {
 	private readonly _apiUpdateTask: (id: string, payload: ApiTaskPayload) => Promise<ApiTask>;
 	private readonly _apiDeleteTask: (id: string) => Promise<ApiTask>;
 
-	public constructor(params: TasksViewModelParams) {
-		const {
-			apiTasks,
-			apiCreateTask,
-			apiUpdateTask,
-			apiDeleteTask,
-		} = params;
-
+	public constructor(apiTransport: IApiTasksTransport) {
 		this.tasks$ = this._tasks$.asObservable();
-		this._apiTasks = apiTasks;
-		this._apiCreateTask = apiCreateTask;
-		this._apiUpdateTask = apiUpdateTask;
-		this._apiDeleteTask = apiDeleteTask;
+		this._apiTasks = apiTransport.tasks;
+		this._apiCreateTask = apiTransport.createTask;
+		this._apiUpdateTask = apiTransport.updateTask;
+		this._apiDeleteTask = apiTransport.deleteTask;
 	}
 
 	public tasks = (): ApiTask[] => {

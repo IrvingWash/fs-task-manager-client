@@ -8,11 +8,13 @@ export interface ApiError {
 	message: string;
 }
 
+export interface ApiTokens {
+	accessToken: string;
+	refreshToken: string;
+}
+
 export interface ApiAuthResult {
-	tokens: {
-		accessToken: string;
-		refreshToken: string;
-	},
+	tokens: ApiTokens;
 	username: string;
 }
 

@@ -7,7 +7,8 @@ import {
 } from 'react-router-dom';
 
 import { ApiTransport } from './api/api-transport';
-
+import { CredentialStorage } from './api/credential-storage';
+import { Auth } from './auth/auth';
 import { Header } from './components/header/header';
 import { TasksViewModel } from './models/tasks-view-model';
 import { SignInPage } from './pages/auth-pages/sign-in-page';
@@ -19,14 +20,10 @@ interface AppState {
 }
 
 export class App extends React.Component<Record<string, never>, AppState> {
-	private _apiTransport = new ApiTransport();
-
-	private _taskModel = new TasksViewModel({
-		apiCreateTask: this._apiTransport.createTask,
-		apiTasks: this._apiTransport.tasks,
-		apiUpdateTask: this._apiTransport.updateTask,
-		apiDeleteTask: this._apiTransport.deleteTask,
-	});
+	private _apiTransport: ApiTransport;
+	private _credentialStorage = new CredentialStorage();
+	private _auth: Auth;
+	private _taskModel: TasksViewModel;
 
 	public constructor() {
 		super({});
@@ -34,6 +31,17 @@ export class App extends React.Component<Record<string, never>, AppState> {
 		this.state = {
 			username: null,
 		};
+
+		this._apiTransport = new ApiTransport(this._credentialStorage);
+
+		this._auth = new Auth({
+			apiTransport: this._apiTransport,
+			credentialStorage: this._credentialStorage,
+			updateUsername: this._updateUsername,
+		});
+
+		this._taskModel = new TasksViewModel(this._apiTransport);
+
 	}
 
 	public override render(): JSX.Element {
@@ -41,7 +49,7 @@ export class App extends React.Component<Record<string, never>, AppState> {
 			<BrowserRouter>
 				<Header 
 					username={ this.state.username }
-					logout={ this._apiTransport.logout }
+					logout={ this._auth.logout }
 					updateUsername={ this._updateUsername }
 				/>
 
@@ -49,14 +57,12 @@ export class App extends React.Component<Record<string, never>, AppState> {
 					<Route path='/' element={ <TasksPage model={ this._taskModel } /> } />
 					<Route path='/signup' element={
 						<SignUpPage
-							signUp={ this._apiTransport.signUp }
-							updateUsername={ this._updateUsername }
+							signUp={ this._auth.signUp }
 						/>
 					} />
 					<Route path='/signin' element={
 						<SignInPage
-							signIn={ this._apiTransport.signIn }
-							updateUsername={ this._updateUsername }
+							signIn={ this._auth.signIn }
 						/>
 					} />
 				</Routes>
